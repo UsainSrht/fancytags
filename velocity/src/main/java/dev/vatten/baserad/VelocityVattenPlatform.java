@@ -1,5 +1,5 @@
 /*
- *    Copyright 2025 vatten <vatten.dev>
+ *    Copyright 2026 vatten <vatten.dev>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -43,13 +44,15 @@ public class VelocityVattenPlatform implements VattenPlatform<Player, ScheduledT
     private final ProxyServer server;
     private final Logger logger;
     private final Path dataDirectory;
+    private final PluginManager pluginManager;
     private VattenPlugin plugin;
 
     @Inject
-    public VelocityVattenPlatform(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public VelocityVattenPlatform(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory, PluginManager pluginManager) {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
+        this.pluginManager = pluginManager;
     }
 
     @Subscribe
@@ -59,6 +62,10 @@ public class VelocityVattenPlatform implements VattenPlatform<Player, ScheduledT
                 VattenPlugin.Type.PROXY,
                 this.dataDirectory
         );
+
+        if (pluginManager.getPlugin("miniplaceholders").isPresent()) {
+            ((Plugin) this.plugin).registerMiniPlaceholders();
+        }
     }
 
     @Override

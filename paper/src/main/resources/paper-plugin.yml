@@ -1,5 +1,5 @@
 #
-#    Copyright 2025 vatten <vatten.dev>
+#    Copyright 2026 vatten <vatten.dev>
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,10 +17,13 @@
 name: "${pluginName}"
 version: "${version}"
 main: "dev.vatten.baserad.PaperVattenPlatform"
-api-version: '1.21'
+api-version: '1.21.11'
 
 dependencies:
   server:
     PlaceholderAPI:
+      load: BEFORE
+      required: false
+    MiniPlaceholders:
       load: BEFORE
       required: false

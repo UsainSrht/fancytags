@@ -42,6 +42,7 @@ allprojects {
         compileOnly("net.kyori:adventure-api:4.25.0")
         compileOnly("net.kyori:adventure-text-minimessage:4.25.0")
         compileOnly("me.clip:placeholderapi:2.11.6")
+        compileOnly("io.github.miniplaceholders:miniplaceholders-api:3.0.1")
 
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
@@ -61,7 +62,7 @@ allprojects {
         header.set(resources.text.fromFile(rootProject.file("HEADER")))
         properties {
             set("name", "vatten <vatten.dev>")
-            set("year", 2025)
+            set("year", 2026)
         }
     }
 

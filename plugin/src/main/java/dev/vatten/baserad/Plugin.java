@@ -1,3 +1,19 @@
+/*
+ *    Copyright 2026 vatten <vatten.dev>
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package dev.vatten.baserad;
 
 import dev.vatten.baserad.commands.TagsCommand;
@@ -5,6 +21,7 @@ import dev.vatten.baserad.configs.PluginConfig;
 import dev.vatten.baserad.configs.TagsConfig;
 import dev.vatten.baserad.events.PlayerLoadInEvent;
 import dev.vatten.baserad.interfaces.Interfaces;
+import io.github.miniplaceholders.api.Expansion;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
@@ -20,7 +37,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class Plugin extends VattenPlugin {
-    private final MiniMessage MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
+    private MiniMessage MINIMESSAGE = null;
     private ConfigInstance<PluginConfig> PLUGIN_CONFIG;
     private ConfigInstance<TagsConfig> TAGS_CONFIG;
     @Getter
@@ -57,6 +74,8 @@ public class Plugin extends VattenPlugin {
         );
 
         getEventHandler().registerEventHandler(PlayerLoadInEvent.class, this::onPlayerLoadIn);
+
+        MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).resolver(TagResolver.resolver("fancytags_internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
     }
 
     @Override
@@ -74,9 +93,7 @@ public class Plugin extends VattenPlugin {
         internalTagStore = new InternalTagStore(this);
         pluginTextFormatter = new TextFormatter(internalTagStore.getTag("fancytags_logo").asComponent().appendSpace(), Style.empty());
         tagStore = new TagStore(this, getTagsConfig().getTags());
-        if(!getPluginConfig().getMineSkinSettings().getApiKey().isEmpty()) {
-            tagGenerator = new TagGenerator(this);
-        }
+        tagGenerator = !getPluginConfig().getMineSkinSettings().getApiKey().isEmpty() ? new TagGenerator(this) : null;
         interfaces = new Interfaces(this);
 
         if(timer != null) timer.cancel();
@@ -112,6 +129,16 @@ public class Plugin extends VattenPlugin {
 
     public MiniMessage getMiniMessage() {
         return MINIMESSAGE;
+    }
+
+    void registerMiniPlaceholders() {
+        Expansion.builder("fancytags")
+                .author("vatten")
+                .version(this.pluginInfo.version())
+                .globalPlaceholder("tag", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))
+                .globalPlaceholder("internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent()))
+                .build()
+                .register();
     }
 
     public class API extends VattenPlugin.API {

@@ -1,5 +1,5 @@
 /*
- *    Copyright 2025 vatten <vatten.dev>
+ *    Copyright 2026 vatten <vatten.dev>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,6 +48,10 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new PaperFancyTagsExpansion((Plugin) this.plugin).register();
+        }
+
+        if (Bukkit.getPluginManager().isPluginEnabled("MiniPlaceholders")) {
+            ((Plugin) this.plugin).registerMiniPlaceholders();
         }
 
         getServer().getPluginManager().registerEvents(this, this);
