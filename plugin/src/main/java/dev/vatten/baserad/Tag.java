@@ -38,11 +38,13 @@ public class Tag implements Renderable {
 
     Component serialize(MiniMessage miniMessage) {
         TextComponent.Builder componentBuilder = Component.text();
+        StringBuilder miniMessageBuilder = new StringBuilder();
         for(Symbol symbol : symbols) {
             componentBuilder.append(symbol.serialize());
+            miniMessageBuilder.append(symbol.serializeMiniMessage());
         }
         this.component = componentBuilder.build();
-        this.miniMessage = miniMessage.serialize(this.component);
+        this.miniMessage = miniMessageBuilder.toString();
         return this.component;
     }
 

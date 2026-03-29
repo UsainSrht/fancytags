@@ -37,4 +37,9 @@ public class PlayerSymbol extends Symbol {
     public Component serialize() {
         return Component.object(ObjectContents.playerHead().profileProperty(PlayerHeadObjectContents.property("textures", this.value, this.signature)).build());
     }
+
+    @Override
+    public String serializeMiniMessage() {
+        return "<head:" + quotedMiniMessageArgument("textures") + ":" + quotedMiniMessageArgument(this.value) + ":" + quotedMiniMessageArgument(this.signature) + "/>";
+    }
 }

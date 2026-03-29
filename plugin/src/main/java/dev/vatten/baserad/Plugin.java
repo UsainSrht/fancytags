@@ -37,7 +37,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class Plugin extends VattenPlugin {
-    private MiniMessage MINIMESSAGE = null;
+    private MiniMessage MINIMESSAGE;
     private ConfigInstance<PluginConfig> PLUGIN_CONFIG;
     private ConfigInstance<TagsConfig> TAGS_CONFIG;
     @Getter
@@ -75,7 +75,7 @@ public class Plugin extends VattenPlugin {
 
         getEventHandler().registerEventHandler(PlayerLoadInEvent.class, this::onPlayerLoadIn);
 
-        MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).resolver(TagResolver.resolver("fancytags_internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
+        getMiniMessage();
     }
 
     @Override
@@ -128,6 +128,9 @@ public class Plugin extends VattenPlugin {
     }
 
     public MiniMessage getMiniMessage() {
+        if(MINIMESSAGE == null) {
+            MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).resolver(TagResolver.resolver("fancytags_internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
+        }
         return MINIMESSAGE;
     }
 

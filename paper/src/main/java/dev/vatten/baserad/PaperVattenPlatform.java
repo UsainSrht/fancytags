@@ -30,16 +30,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.jspecify.annotations.Nullable;
+import space.arim.morepaperlib.MorePaperLib;
 
 import java.util.Collection;
 
-public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Player, BukkitTask>, Listener {
+public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Player, space.arim.morepaperlib.scheduling.ScheduledTask>, Listener {
     private VattenPlugin plugin;
+    private MorePaperLib morePaperLib;
 
     @Override
     public void onEnable() {
+        this.morePaperLib = new MorePaperLib(this);
         this.plugin = new Plugin(
                 this,
                 VattenPlugin.Type.SERVER,
@@ -62,12 +64,14 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
 
     @Override
     public BukkitScheduledTask scheduleTask(Runnable runnable, int delay) {
-        return new BukkitScheduledTask(getServer().getScheduler().runTaskLater(this, runnable, delay/50));
+        long initialDelayTicks = Math.max(1L, delay / 50L);
+        return new BukkitScheduledTask(morePaperLib.scheduling().globalRegionalScheduler().runDelayed(runnable, initialDelayTicks));
     }
 
     @Override
     public BukkitScheduledTask scheduleRepeatingTask(Runnable runnable, int delay, int period) {
-        return new BukkitScheduledTask(getServer().getScheduler().runTaskTimer(this, runnable, delay/50, period/50));
+        long initialDelayTicks = Math.max(1L, delay / 50L);
+        return new BukkitScheduledTask(morePaperLib.scheduling().globalRegionalScheduler().runAtFixedRate(runnable, initialDelayTicks, period / 50L));
     }
 
     @Override

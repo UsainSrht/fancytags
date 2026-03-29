@@ -24,4 +24,10 @@ import net.kyori.adventure.text.Component;
 @Configuration
 public abstract class Symbol {
     public abstract Component serialize();
+
+    public abstract String serializeMiniMessage();
+
+    protected static String quotedMiniMessageArgument(String input) {
+        return "'" + input.replace("\\", "\\\\").replace("'", "\\'") + "'";
+    }
 }
