@@ -129,7 +129,13 @@ public class Plugin extends VattenPlugin {
 
     public MiniMessage getMiniMessage() {
         if(MINIMESSAGE == null) {
-            MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).resolver(TagResolver.resolver("fancytags_internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
+            MINIMESSAGE = MiniMessage.builder()
+                    .tags(TagResolver.builder()
+                            .resolver(StandardTags.defaults())
+                            .resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent())))
+                            .resolver(TagResolver.resolver("fancytags_internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent())))
+                            .build()
+                    ).build();
         }
         return MINIMESSAGE;
     }

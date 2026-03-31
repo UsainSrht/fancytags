@@ -40,6 +40,6 @@ public class PlayerSymbol extends Symbol {
 
     @Override
     public String serializeMiniMessage() {
-        return "<head:" + quotedMiniMessageArgument("textures") + ":" + quotedMiniMessageArgument(this.value) + ":" + quotedMiniMessageArgument(this.signature) + "/>";
+        return "<signed_head:" + this.value + ":" +  this.signature + ">";
     }
 }

@@ -40,6 +40,6 @@ public class AtlasSymbol extends Symbol {
 
     @Override
     public String serializeMiniMessage() {
-        return "<sprite:" + quotedMiniMessageArgument(this.atlas) + ":" + quotedMiniMessageArgument(this.sprite) + "/>";
+        return "<sprite:" + this.atlas + ":" +  this.sprite + ">";
     }
 }
