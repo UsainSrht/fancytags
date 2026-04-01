@@ -115,4 +115,8 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
     public void onPlayerLoadedIn(PlayerClientLoadedWorldEvent event) {
         plugin.getEventHandler().dispatchEvent(new PlayerLoadInEvent(wrapPlayer(event.getPlayer())));
     }
+
+    public VattenPlugin getPlugin() {
+        return this.plugin;
+    }
 }
