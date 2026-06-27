@@ -23,12 +23,15 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
+import dev.vatten.baserad.symbols.PlayerSymbol;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
 @NoArgsConstructor
 public class Tag implements Renderable {
     private List<Symbol> symbols;
+    private String fallback;
     private transient Component component;
     private transient String miniMessage;
 
@@ -36,11 +39,50 @@ public class Tag implements Renderable {
         this.symbols = symbols;
     }
 
+    public String getFallback() {
+        return fallback;
+    }
+
+    public void setFallback(String fallback) {
+        this.fallback = fallback;
+    }
+
     Component serialize(MiniMessage miniMessage) {
+        return serialize(miniMessage, "");
+    }
+
+    Component serialize(MiniMessage miniMessage, String key) {
         TextComponent.Builder componentBuilder = Component.text();
         StringBuilder minimessageBuilder = new StringBuilder();
-        for(Symbol symbol : symbols) {
-            componentBuilder.append(symbol.serialize());
+
+        List<PlayerSymbol> headSymbols = new ArrayList<>();
+        for (Symbol symbol : symbols) {
+            if (symbol instanceof PlayerSymbol playerSymbol) {
+                headSymbols.add(playerSymbol);
+            }
+        }
+
+        int numHeads = headSymbols.size();
+        String fallbackStr = (this.fallback != null && !this.fallback.isEmpty()) ? this.fallback : key;
+
+        int headIndex = 0;
+        for (Symbol symbol : symbols) {
+            if (symbol instanceof PlayerSymbol playerSymbol) {
+                Component fallbackComponent;
+                if (fallbackStr.length() == numHeads) {
+                    fallbackComponent = Component.text(String.valueOf(fallbackStr.charAt(headIndex)));
+                } else {
+                    if (headIndex == 0) {
+                        fallbackComponent = Component.text(fallbackStr);
+                    } else {
+                        fallbackComponent = Component.text("");
+                    }
+                }
+                componentBuilder.append(playerSymbol.serialize(fallbackComponent));
+                headIndex++;
+            } else {
+                componentBuilder.append(symbol.serialize());
+            }
             minimessageBuilder.append(symbol.serializeMiniMessage());
         }
         this.component = componentBuilder.build();
