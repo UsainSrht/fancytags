@@ -29,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.Nullable;
 import space.arim.morepaperlib.MorePaperLib;
@@ -38,6 +39,8 @@ import java.util.Collection;
 public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Player, space.arim.morepaperlib.scheduling.ScheduledTask>, Listener {
     private VattenPlugin plugin;
     private MorePaperLib morePaperLib;
+    private boolean papiRegistered;
+    private boolean miniPlaceholdersRegistered;
 
     @Override
     public void onEnable() {
@@ -48,15 +51,9 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
                 this.getDataFolder().toPath()
         );
 
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            new PaperFancyTagsExpansion((Plugin) this.plugin).register();
-        }
-
-        if (Bukkit.getPluginManager().isPluginEnabled("MiniPlaceholders")) {
-            ((Plugin) this.plugin).registerMiniPlaceholders();
-        }
-
         getServer().getPluginManager().registerEvents(this, this);
+
+        registerExpansions();
 
         int pluginId = 27900;
         Metrics metrics = new Metrics(this, pluginId);
@@ -99,6 +96,26 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
         VattenPlayer existingPlayer = plugin.getPlayer(player.getUniqueId());
         if(existingPlayer != null) return existingPlayer;
         return new VattenPlayer(player.getUniqueId(), player.getName(), player);
+    }
+
+    private void registerExpansions() {
+        if (!papiRegistered && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new PaperFancyTagsExpansion((Plugin) this.plugin).register();
+            papiRegistered = true;
+        }
+
+        if (!miniPlaceholdersRegistered && Bukkit.getPluginManager().isPluginEnabled("MiniPlaceholders")) {
+            ((Plugin) this.plugin).registerMiniPlaceholders();
+            miniPlaceholdersRegistered = true;
+        }
+    }
+
+    @EventHandler
+    public void onPluginEnable(PluginEnableEvent event) {
+        String name = event.getPlugin().getName();
+        if ("PlaceholderAPI".equals(name) || "MiniPlaceholders".equals(name)) {
+            registerExpansions();
+        }
     }
 
     @EventHandler
