@@ -34,9 +34,16 @@ public class Tag implements Renderable {
     private String fallback;
     private transient Component component;
     private transient String miniMessage;
+    private transient MiniMessage lastMiniMessage;
+    private transient String lastKey;
 
     public Tag(List<Symbol> symbols) {
         this.symbols = symbols;
+    }
+
+    public Tag(List<Symbol> symbols, String fallback) {
+        this.symbols = symbols;
+        this.fallback = fallback;
     }
 
     public String getFallback() {
@@ -45,6 +52,9 @@ public class Tag implements Renderable {
 
     public void setFallback(String fallback) {
         this.fallback = fallback;
+        if (this.lastMiniMessage != null) {
+            serialize(this.lastMiniMessage, this.lastKey != null ? this.lastKey : "");
+        }
     }
 
     Component serialize(MiniMessage miniMessage) {
@@ -52,6 +62,8 @@ public class Tag implements Renderable {
     }
 
     Component serialize(MiniMessage miniMessage, String key) {
+        this.lastMiniMessage = miniMessage;
+        this.lastKey = key;
         TextComponent.Builder componentBuilder = Component.text();
         StringBuilder minimessageBuilder = new StringBuilder();
 
@@ -69,14 +81,26 @@ public class Tag implements Renderable {
         for (Symbol symbol : symbols) {
             if (symbol instanceof PlayerSymbol playerSymbol) {
                 Component fallbackComponent;
-                if (fallbackStr.length() == numHeads) {
-                    fallbackComponent = Component.text(String.valueOf(fallbackStr.charAt(headIndex)));
-                } else {
-                    if (headIndex == 0) {
-                        fallbackComponent = Component.text(fallbackStr);
+                if (fallbackStr != null && !fallbackStr.isEmpty()) {
+                    Component parsedFallback = miniMessage != null ? miniMessage.deserialize(fallbackStr) : Component.text(fallbackStr);
+                    if (numHeads > 1) {
+                        if (parsedFallback.children().size() == numHeads) {
+                            fallbackComponent = parsedFallback.children().get(headIndex);
+                        } else if (fallbackStr.length() == numHeads) {
+                            String charStr = String.valueOf(fallbackStr.charAt(headIndex));
+                            fallbackComponent = miniMessage != null ? miniMessage.deserialize(charStr) : Component.text(charStr);
+                        } else {
+                            if (headIndex == 0) {
+                                fallbackComponent = parsedFallback;
+                            } else {
+                                fallbackComponent = Component.empty();
+                            }
+                        }
                     } else {
-                        fallbackComponent = Component.text("");
+                        fallbackComponent = parsedFallback;
                     }
+                } else {
+                    fallbackComponent = Component.empty();
                 }
                 componentBuilder.append(playerSymbol.serialize(fallbackComponent));
                 headIndex++;

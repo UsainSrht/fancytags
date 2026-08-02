@@ -72,7 +72,7 @@ public class TagGenerator {
                 symbols[symbolIndex] = new PlayerSymbol(skinInfo.texture().data().value(), skinInfo.texture().data().signature());
                 onUpdate.accept(progress);
                 if(progress.getCurrent() == progress.getMax()) {
-                    future.complete(new Tag(List.of(symbols)));
+                    future.complete(new Tag(List.of(symbols), name));
                 }
             }).exceptionally(throwable -> {
                 future.completeExceptionally(throwable);
