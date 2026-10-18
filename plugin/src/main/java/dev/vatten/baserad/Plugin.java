@@ -92,8 +92,10 @@ public class Plugin extends VattenPlugin {
         TAGS_CONFIG.load();
         internalTagStore = new InternalTagStore(this);
         pluginTextFormatter = new TextFormatter(internalTagStore.getTag("fancytags_logo").asComponent().appendSpace(), Style.empty());
-        tagStore = new TagStore(this, getTagsConfig().getTags());
-        tagGenerator = !getPluginConfig().getMineSkinSettings().getApiKey().isEmpty() ? new TagGenerator(this) : null;
+        if(tagGenerator != null) {
+            tagGenerator.shutdown();
+        }
+        tagGenerator = !getPluginConfig().getMineSkinSettings().getApiKey().isBlank() ? new TagGenerator(this) : null;
         interfaces = new Interfaces(this);
 
         if(timer != null) timer.cancel();
