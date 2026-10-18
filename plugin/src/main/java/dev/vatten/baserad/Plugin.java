@@ -92,6 +92,7 @@ public class Plugin extends VattenPlugin {
         TAGS_CONFIG.load();
         internalTagStore = new InternalTagStore(this);
         pluginTextFormatter = new TextFormatter(internalTagStore.getTag("fancytags_logo").asComponent().appendSpace(), Style.empty());
+        tagStore = new TagStore(this, getTagsConfig().getTags());
         if(tagGenerator != null) {
             tagGenerator.shutdown();
         }
@@ -107,6 +108,7 @@ public class Plugin extends VattenPlugin {
     }
 
     private void refreshTags(VattenPlayer tagsPlayer) {
+        if(getTagStore() == null || getInternalTagStore() == null) return;
         tagsPlayer.showTitle(Title.title(Component.text("  ".repeat((int) Math.ceil((getTagStore().getTagAtlasLength() + getInternalTagStore().getTagAtlasLength()) * getPluginConfig().getCacheSettings().getOffScreenRatio()))).append(getInternalTagStore().getTagAtlas().append(getTagStore().getTagAtlas())), Component.empty(), 0, 40, 0));
     }
 
